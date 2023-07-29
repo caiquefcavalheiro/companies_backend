@@ -4,7 +4,12 @@ from http import HTTPStatus
 from app.models import User
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.exceptions import InvalidIdError, InvalidPaginateParams
+from app.exceptions import (
+    InvalidIdError,
+    InvalidPaginateParams,
+    AttributeTypeError,
+    MissingKeysError,
+)
 from app.services.general_services import GeneralServices
 from app.services.paginate_list_services import PaginateListServices
 
@@ -45,10 +50,15 @@ class UserController:
     def create_user(self):
         user_data = request.get_json()
         try:
+            check_data = GeneralServices().check_keys(user_data, self.user_keys)
+            GeneralServices().check_keys_type(check_data, self.user_key_types)
+
             self.repository.create(user_data, User)
             return {"message": "create user sucessfull"}, HTTPStatus.CREATED
-        except IntegrityError as e:
+        except IntegrityError:
             return {"error": "Email already in use"}, HTTPStatus.CONFLICT
+        except (AttributeTypeError, MissingKeysError) as e:
+            return e.response, e.status_code
 
     @jwt_required()
     def update_user(self):
