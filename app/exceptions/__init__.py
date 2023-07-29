@@ -1,2 +1,4 @@
 from .user_exceptions import EmailFormatError, NameFormatError, NotLoggedUserError
 from .companie_exceptions import CNAEFormatError, CNPJFormatError
+from .Invalid_Id_execeptions import InvalidIdError
+from .paginate_params_execeptions import InvalidPaginateParams
