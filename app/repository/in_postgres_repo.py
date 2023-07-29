@@ -6,6 +6,8 @@ class InPostgresRepository:
     def __init__(self) -> None:
         self.db = db
         self.session = self.db.session
+
+    def list(self, Database):
         pass
 
     def create(self, data, Database):

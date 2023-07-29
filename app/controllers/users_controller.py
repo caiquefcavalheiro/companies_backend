@@ -3,6 +3,7 @@ from flask import request
 from http import HTTPStatus
 from app.models import User
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 class UserController:
@@ -20,3 +21,13 @@ class UserController:
             return {"message": "create user sucessfull"}, HTTPStatus.CREATED
         except IntegrityError as e:
             return {"error": "Email already in use"}, HTTPStatus.CONFLICT
+
+    @jwt_required()
+    def update_user(self):
+        user_id = get_jwt_identity()
+        pass
+
+    @jwt_required()
+    def delete_user(self):
+        user_id = get_jwt_identity()
+        pass
