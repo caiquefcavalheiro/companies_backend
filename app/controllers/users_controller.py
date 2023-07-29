@@ -53,7 +53,7 @@ class UserController:
             check_data = GeneralServices().check_keys(user_data, self.user_keys)
             GeneralServices().check_keys_type(check_data, self.user_key_types)
 
-            self.repository.create(user_data, User)
+            self.repository.create(check_data, User)
             return {"message": "create user sucessfull"}, HTTPStatus.CREATED
         except IntegrityError:
             return {"error": "Email already in use"}, HTTPStatus.CONFLICT
@@ -61,9 +61,29 @@ class UserController:
             return e.response, e.status_code
 
     @jwt_required()
-    def update_user(self):
-        user_id = get_jwt_identity()
+    def update_user(self, user_id):
+        logged_user_id = get_jwt_identity()
         update_data = request.get_json()
+
+        try:
+            GeneralServices().validate_id(user_id, User)
+            find_user = self.repository.list_one(user_id, User)
+
+            check_data, _ = GeneralServices().remove_unnecessary_keys(
+                update_data, self.user_keys
+            )
+
+            GeneralServices().check_keys_type(check_data, self.user_key_types)
+
+            return {}
+
+            # self.repository.create(check_data, User)
+            # return {"message": "create user sucessfull"}, HTTPStatus.CREATED
+
+        except IntegrityError:
+            return {"error": "Email already in use"}, HTTPStatus.CONFLICT
+        except (AttributeTypeError, MissingKeysError, InvalidIdError) as e:
+            return e.response, e.status_code
 
         pass
 

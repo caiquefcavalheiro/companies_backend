@@ -22,7 +22,7 @@ class User(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name = Column(String(100), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
-    hash_password = Column(String(255))
+    hash_password = Column(String(255), nullable=False)
 
     @property
     def password(self):

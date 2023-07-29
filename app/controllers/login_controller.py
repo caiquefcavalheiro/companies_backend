@@ -12,7 +12,7 @@ class LoginController:
         found_user = User.query.filter_by(email=login_data["email"]).first()
 
         access_token = create_access_token(
-            identity=found_user.id, expires_delta=timedelta(minutes=1)
+            identity=found_user.id, expires_delta=timedelta(hours=1)
         )
 
         response = {"access_token": access_token}
