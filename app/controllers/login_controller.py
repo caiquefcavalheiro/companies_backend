@@ -11,6 +11,11 @@ class LoginController:
 
         found_user = User.query.filter_by(email=login_data["email"]).first()
 
+        if not found_user:
+            return {
+                "message": "email or password are incorrect"
+            }, HTTPStatus.BAD_REQUEST
+
         access_token = create_access_token(
             identity=found_user.id, expires_delta=timedelta(hours=1)
         )

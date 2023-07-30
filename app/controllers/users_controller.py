@@ -38,7 +38,7 @@ class UserController:
 
         return jsonify(users_list), HTTPStatus.OK
 
-    def list_one_user(self, user_id):
+    def list_one_user(self, user_id: str):
         try:
             GeneralServices().validate_id(user_id, User)
 
@@ -63,7 +63,7 @@ class UserController:
             return e.response, e.status_code
 
     @jwt_required()
-    def update_user(self, user_id):
+    def update_user(self, user_id: str):
         logged_user_id = get_jwt_identity()
         update_data = request.get_json()
 
@@ -92,6 +92,13 @@ class UserController:
 
     @jwt_required()
     def delete_user(self, user_id: str):
-        user_id = get_jwt_identity()
+        logged_user_id = get_jwt_identity()
 
-        pass
+        try:
+            GeneralServices().validate_id(user_id, User)
+            PermissionsService().check_if_user_owner_or_admin(user_id, logged_user_id)
+            self.repository.delete(user_id, User)
+        except (InvalidIdError, PermissionError) as e:
+            return e.response, e.status_code
+
+        return "", HTTPStatus.NO_CONTENT

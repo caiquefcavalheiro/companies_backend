@@ -46,4 +46,7 @@ class InPostgresRepository:
         return update_user
 
     def delete(self, id: str, Database: db.Model):
-        pass
+        user_to_delete = self.session.query(Database).filter(Database.id == id).first()
+
+        self.session.delete(user_to_delete)
+        self.session.commit()
