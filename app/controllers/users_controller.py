@@ -6,12 +6,14 @@ from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.exceptions import (
     InvalidIdError,
-    InvalidPaginateParams,
+    InvalidPaginateParamsError,
     AttributeTypeError,
     MissingKeysError,
+    PermissionError,
 )
 from app.services.general_services import GeneralServices
 from app.services.paginate_list_services import PaginateListServices
+from app.services.permissions_services import PermissionsService
 
 
 class UserController:
@@ -29,7 +31,7 @@ class UserController:
             PaginateListServices().validate_page_atributes(
                 start, limit, sort, dir, ["name", "email", "id"]
             )
-        except InvalidPaginateParams as e:
+        except InvalidPaginateParamsError as e:
             return jsonify(e.response), e.status_code
 
         users_list = self.repository.list(User, sort, dir, start, limit)
@@ -67,7 +69,7 @@ class UserController:
 
         try:
             GeneralServices().validate_id(user_id, User)
-
+            PermissionsService().check_if_user_owner_or_admin(user_id, logged_user_id)
             check_data, _ = GeneralServices().remove_unnecessary_keys(
                 update_data, self.user_keys
             )
@@ -80,7 +82,12 @@ class UserController:
 
         except IntegrityError:
             return {"error": "Email already in use"}, HTTPStatus.CONFLICT
-        except (AttributeTypeError, MissingKeysError, InvalidIdError) as e:
+        except (
+            AttributeTypeError,
+            MissingKeysError,
+            InvalidIdError,
+            PermissionError,
+        ) as e:
             return e.response, e.status_code
 
     @jwt_required()
