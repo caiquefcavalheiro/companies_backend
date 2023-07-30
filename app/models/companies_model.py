@@ -17,6 +17,7 @@ class Companies(db.Model):
     cnpj: str
     nome_fantasia: str
     nome_razao: str
+    user_id: str
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     cnae = Column(String(7), nullable=False)
@@ -27,27 +28,20 @@ class Companies(db.Model):
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
 
-    def __init__(self, cnae, cnpj, nome_fantasia, nome_razao):
-        self.cnae = cnae
-        self.cnpj = cnpj
-        self.nome_fantasia = nome_fantasia
-        self.nome_razao = nome_razao
-
     @validates("cnae")
     def verify_cnae(self, key, cnae_to_verify: str):
-        format_cnae = f"{cnae_to_verify[:4]}-{cnae_to_verify[4:5]}/{cnae_to_verify[5:]}"
         regex = r"^\d{4}-\d{1}/\d{2}$"  # format 1111-2/33
+        format_cnae = cnae_to_verify.replace("-", "").replace("/", "")
 
-        if re.fullmatch(regex, format_cnae):
+        if re.fullmatch(regex, cnae_to_verify):
             return format_cnae
         raise CNAEFormatError
 
     @validates("cnpj")
     def verify_cnpj(self, key, cnpj_to_verify: str):
-        format_cnpj = f"{cnpj_to_verify[:2]}.{cnpj_to_verify[2:5]}.{cnpj_to_verify[5:8]}/{cnpj_to_verify[8:12]}-{cnpj_to_verify[12:]}"
-
         regex = r"^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$"  # format 11.222.333/4444-55
+        format_cnpj = cnpj_to_verify.replace("/", "").replace(".", "").replace("-", "")
 
-        if re.fullmatch(regex, format_cnpj):
+        if re.fullmatch(regex, cnpj_to_verify):
             return format_cnpj
         raise CNPJFormatError

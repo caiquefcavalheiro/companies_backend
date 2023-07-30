@@ -9,7 +9,7 @@ class PaginateListServices:
             raise InvalidPaginateParamsError(
                 {"message": "The start parameter needs to be 0 or greater"}
             )
-        elif limit <= 0:
+        elif limit < 0:
             raise InvalidPaginateParamsError(
                 {"message": "The limit parameter needs to be 0 or greater"}
             )

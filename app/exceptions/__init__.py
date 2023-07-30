@@ -1,5 +1,5 @@
-from .user_exceptions import EmailFormatError, NameFormatError, NotLoggedUserError
-from .companie_exceptions import CNAEFormatError, CNPJFormatError
+from .user_exceptions import EmailFormatError, NameFormatError
+from .companie_exceptions import CNAEFormatError, CNPJFormatError, CNPJNotFound
 from .Invalid_Id_exceptions import InvalidIdError
 from .paginate_params_exceptions import InvalidPaginateParamsError
 from .attribute_type_exceptions import AttributeTypeError

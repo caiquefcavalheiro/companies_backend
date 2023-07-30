@@ -7,7 +7,7 @@ class InPostgresRepository:
         self.db = db
         self.session = self.db.session
 
-    def list(self, Database: db.Model, sort, dir, start, limit):
+    def list(self, Database: db.Model, sort: str, dir: str, start: int, limit: int):
         list_data = (
             self.session.query(Database)
             .order_by(getattr(getattr(Database, sort), dir)())
@@ -28,14 +28,25 @@ class InPostgresRepository:
 
         return user
 
-    def create(self, data, Database: db.Model):
+    def create(self, data: dict, Database: db.Model):
         new_model = Database(**data)
         self.session.add(new_model)
         self.session.commit()
 
         return new_model
 
-    def update(self, id: str, data, Database: db.Model):
+    def create_with_relation(
+        self, data: dict, Database: db.Model, id: str, relation_field_name: str
+    ):
+        new_model = Database(**data)
+
+        setattr(new_model, relation_field_name, id)
+        self.session.add(new_model)
+        self.session.commit()
+
+        return new_model
+
+    def update(self, id: str, data: dict, Database: db.Model):
         update_user = self.session.query(Database).filter(Database.id == id).first()
 
         for key, value in data.items():
@@ -45,8 +56,10 @@ class InPostgresRepository:
 
         return update_user
 
-    def delete(self, id: str, Database: db.Model):
-        user_to_delete = self.session.query(Database).filter(Database.id == id).first()
+    def delete(self, id: str, Database: db.Model, field: str = "id"):
+        user_to_delete = (
+            self.session.query(Database).filter(getattr(Database, field) == id).first()
+        )
 
         self.session.delete(user_to_delete)
         self.session.commit()

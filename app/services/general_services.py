@@ -1,5 +1,10 @@
 from app.configs.database import db
-from app.exceptions import InvalidIdError, AttributeTypeError, MissingKeysError
+from app.exceptions import (
+    InvalidIdError,
+    AttributeTypeError,
+    MissingKeysError,
+    CNPJNotFound,
+)
 import uuid
 
 
@@ -13,7 +18,13 @@ class GeneralServices:
         search_info = Model.query.filter_by(id=id).first()
 
         if not search_info:
-            raise InvalidIdError({"message": f"The id {id} not found"})
+            raise InvalidIdError({"message": f"The id {id} not found"}, 404)
+
+    def validate_cnpj(self, cnpj: str, Model: db.Model):
+        search_info = Model.query.filter_by(cnpj=cnpj).first()
+
+        if not search_info:
+            raise CNPJNotFound(cnpj)
 
     def remove_unnecessary_keys(self, data: dict, necessary_keys: list):
         new_data = data.copy()

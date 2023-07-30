@@ -22,17 +22,22 @@ class UserController:
     user_key_types = {"name": str, "email": str, "password": str}
 
     def list_users(self):
-        start = int(request.args.get("start", 0))
-        limit = int(request.args.get("limit", 10))
-        sort = request.args.get("sort", "id")
-        dir = request.args.get("dir", "asc")
-
         try:
+            start = int(request.args.get("start", 0))
+            limit = int(request.args.get("limit", 10))
+            sort = request.args.get("sort", "id")
+            dir = request.args.get("dir", "asc")
+
             PaginateListServices().validate_page_atributes(
                 start, limit, sort, dir, ["name", "email", "id"]
             )
         except InvalidPaginateParamsError as e:
             return jsonify(e.response), e.status_code
+        except ValueError:
+            return (
+                jsonify({"message": "limit and start need to be number"}),
+                HTTPStatus.BAD_REQUEST,
+            )
 
         users_list = self.repository.list(User, sort, dir, start, limit)
 
@@ -58,7 +63,7 @@ class UserController:
             self.repository.create(check_data, User)
             return {"message": "create user sucessfull"}, HTTPStatus.CREATED
         except IntegrityError:
-            return {"error": "Email already in use"}, HTTPStatus.CONFLICT
+            return {"message": "Email already in use"}, HTTPStatus.CONFLICT
         except (AttributeTypeError, MissingKeysError) as e:
             return e.response, e.status_code
 
@@ -81,7 +86,7 @@ class UserController:
             return jsonify(update_user), HTTPStatus.OK
 
         except IntegrityError:
-            return {"error": "Email already in use"}, HTTPStatus.CONFLICT
+            return {"message": "Email already in use"}, HTTPStatus.CONFLICT
         except (
             AttributeTypeError,
             MissingKeysError,
