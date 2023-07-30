@@ -1,0 +1,647 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "title": "Empresas - 1.0",
+      "description": "### Neste projeto o usuário será capaz de se registrar na plataforma, fazer login e registrar a sua empresa, realizando todas as operações de um CRUD.",
+      "contact": {
+        "email": "caiquefcavalheiro@gmail.com"
+      },
+      "version": "1.0.0"
+    },
+    "externalDocs": {
+      "description": "Github do projeto",
+      "url": "http://swagger.io"
+    },
+    "servers": [
+      {
+        "url": "http://127.0.0.1:5000/"
+      }
+    ],
+    "tags": [
+      {
+        "name": "Users",
+        "description": "CRUD de usuários"
+      },
+      {
+        "name": "Login",
+        "description": "Faça o login do usuário"
+      },
+      {
+        "name": "Companies",
+        "description": "CRUD de empresas"
+      }
+    ],
+    "paths": {
+      "/users": {
+        "get": {
+          "tags": [
+            "Users"
+          ],
+          "summary": "Listagem de usuários",
+          "operationId": "list_users",
+          "parameters": [
+            {
+              "name": "start",
+              "in": "query",
+              "description": "Inicio da busca",
+              "required": false,
+              "explode": true,
+              "schema": {
+                "type": "integer",
+                "default": 0
+              }
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "Quantidade de itens buscados",
+              "required": false,
+              "explode": true,
+              "schema": {
+                "type": "integer",
+                "default": 10
+              }
+            },
+            {
+              "name": "dir",
+              "in": "query",
+              "description": "Ordenação Maior ou Menor",
+              "required": false,
+              "explode": true,
+              "schema": {
+                "type": "string",
+                "default": "asc",
+                "enum": [
+                  "asc",
+                  "desc"
+                ]
+              }
+            },
+            {
+              "name": "sort",
+              "in": "query",
+              "description": "Ordenação por informação",
+              "required": false,
+              "explode": true,
+              "schema": {
+                "type": "string",
+                "default": "id",
+                "enum": [
+                  "id",
+                  "name",
+                  "email"
+                ]
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                   "type": "object",
+                   "properties":{
+                      "data": {"type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id":{"type": "string", "example": "6fbba364-310e-4605-a7e7-e0904df4259b"},
+                        "name": {"type": "string", "example": "Caique"},
+                        "email": {"type": "string", "example": "caique@email.com.br"}
+                      }
+                    }},
+                      "dir": {"type": "string", "example": "asc"},
+                      "limit": {"type": "integer", "example": 10},
+                      "sort": {"type": "string", "example": "id"},
+                      "start": {"type": "integer", "example": 0}
+                   }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Example: The dir parameter must be 'asc' or 'desc'"
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Users"
+          ],
+          "summary": "Criar um novo usuário",
+          "operationId": "create_user",
+          "requestBody": {
+            "description": "Corpo necessário para criar um novo usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "description": "Created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                        "message": {"type": "string", "example": "create user sucessfull"}
+                    }
+                  }
+                }
+              }
+            },
+            "400":{
+              "description": "Missing keys"
+            },
+            "409": {
+              "description": "Email already in use"
+            }
+          }
+        }  
+      },
+      "/users/{userId}":{
+        "get": {
+          "tags": ["Users"],
+          "summary": "Pegar um usuário",
+          "operationId": "list_one_user",
+          "securitySchemes":[
+            {"BearerAuth": []}
+          ],
+          "parameters":[{
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {"type": "string"}
+          }],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            },
+            "400":{
+              "description": "Invalid Id"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        },
+        "patch": {
+          "tags": ["Users"],
+          "summary": "Atualizar usuário",
+          "operationId": "update_user",
+          "securitySchemes":[
+            {"BearerAuth": []}
+          ],
+          "parameters":[{
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {"type": "string"}
+          }],
+          "requestBody":{
+            "description": "Campos possíveis de atualizar",
+            "content": {
+              "application/json":{
+                "schema":{
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            },
+            "400":{
+              "description": "Invalid Id"
+            },
+            "401":{
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        },
+        "delete": {
+          "tags": ["Users"],
+          "summary": "Apagar usuário",
+          "operationId": "delete_user",
+          "securitySchemes":[
+            {"BearerAuth": []}
+          ],
+          "parameters":[{
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {"type": "string"}
+          }],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "400":{
+              "description": "Invalid Id"
+            },
+            "401":{
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        }
+      },
+      "/login":{
+        "post": {
+          "tags": [
+            "Login"
+          ],
+          "summary": "Acessar a conta",
+          "operationId": "login",
+          "requestBody": {
+            "description": "Corpo necessário para acessar a conta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLogin"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                        "access": {"type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5MDc0NDYwMCwianRpIjoiYTYzMmJlZGItNThlOS00MWVlLWJhM2EtYmVjNWJiYjNiODgzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjZmYmJhMzY0LTMxMGUtNDYwNS1hN2U3LWUwOTA0ZGY0MjU5YiIsIm5iZiI6MTY5MDc0NDYwMCwiZXhwIjoxNjkwNzQ4MjAwfQ.8Gfs9jFIxKJJD34zmqdVXlFvXhL8G-0HIuPU0BnpDdk"}
+                    }
+                  }
+                }
+              }
+            },
+            "400":{
+              "description": "Missing keys"
+            },
+            "409": {
+              "description": "Email already in use"
+            }
+          }
+        }
+      },
+      "/companies": {
+        "get": {
+          "tags": ["Companies"],
+          "summary": "Listagem de empresas",
+          "operationId": "list_companies",
+          "parameters": [
+            {
+              "name": "start",
+              "in": "query",
+              "description": "Inicio da busca",
+              "required": false,
+              "explode": true,
+              "schema": {
+                "type": "integer",
+                "default": 0
+              }
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "Quantidade de itens buscados",
+              "required": false,
+              "explode": true,
+              "schema": {
+                "type": "integer",
+                "default": 10
+              }
+            },
+            {
+              "name": "dir",
+              "in": "query",
+              "description": "Ordenação Maior ou Menor",
+              "required": false,
+              "explode": true,
+              "schema": {
+                "type": "string",
+                "default": "asc",
+                "enum": [
+                  "asc",
+                  "desc"
+                ]
+              }
+            },
+            {
+              "name": "sort",
+              "in": "query",
+              "description": "Ordenação por informação",
+              "required": false,
+              "explode": true,
+              "schema": {
+                "type": "string",
+                "default": "id",
+                "enum": [
+                  "id",
+                  "name",
+                  "email"
+                ]
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                   "type": "object",
+                   "properties":{
+                      "data": { "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string", "example": "6fbba364-310e-4605-a7e7-e0904df4259b"},
+                        "user_id": {"type": "string", "example": "6fbba364-310e-4605-a7e7-e0904df4334a"},
+                        "cnae": {"type": "string", "example": "1111-2/33"},
+                        "cnpj": {"type": "string", "example": "11.222.333/4444-55"},
+                        "nome_razao": {"type": "string", "example": "nome_razao"},
+                        "nome_fantasia": {"type": "string", "example": "nome_fantasia"}
+                      }
+                    }},
+                      "dir": {"type": "string", "example": "asc"},
+                      "limit": {"type": "integer", "example": 10},
+                      "sort": {"type": "string", "example": "id"},
+                      "start": {"type": "integer", "example": 0}
+                   }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Example: The dir parameter must be 'asc' or 'desc'"
+            }
+          }
+          
+        },
+        "post": {
+          "tags": ["Companies"],
+          "summary": "Criar uma nova empresa",
+          "operationId": "create_companie",
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "description": "Dados da nova empresa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Companie"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "description": "Created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                        "message": {"type": "string", "example": "create companie sucessfull"}
+                    }
+                  }
+                }
+              }
+            },
+            "400":{
+              "description": "Missing keys"
+            },
+            "409": {
+              "description": "CNPJ already in use"
+            }
+          }
+        }
+      },
+      "/companies/{companie_id}": {
+        "get": {
+          "tags": ["Companies"],
+          "summary": "Obter detalhes de uma empresa",
+          "operationId": "list_one_companie",
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "companie_id",
+              "in": "path",
+              "description": "ID da empresa a ser consultada",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Companie"
+                  }
+                }
+              }
+            },
+            "400":{
+              "description": "Invalid Id"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        },
+        "patch": {
+          "tags": ["Companies"],
+          "summary": "Atualizar uma empresa",
+          "operationId": "update_companie",
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "companie_id",
+              "in": "path",
+              "description": "ID da empresa a ser atualizada",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody":{
+            "description": "Campos possíveis de atualizar",
+            "content": {
+              "application/json":{
+                "schema":{
+                  "type" : "object",
+                    "properties": {
+                      "cnae": {"type": "string", "example": "1111-2/33"},
+                      "nome_fantasia": {"type": "string", "example": "nome_fantasia"}
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/CompanieResponse"
+                  }
+                }
+              }
+            },
+            "400":{
+              "description": "Invalid Id"
+            },
+            "401":{
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        }
+      },
+      "/companies/{companie_cnpj}":{
+        "delete": {
+          "tags": ["Companies"],
+          "summary": "Apagar uma empresa",
+          "operationId": "delete_companie",
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "companie_cnpj",
+              "in": "path",
+              "description": "cnpj da empresa a ser atualizada",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "400":{
+              "description": "Invalid Id"
+            },
+            "401":{
+              "description": "Unauthorized"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string", "example": "Caique"},
+            "email": {"type": "string", "example": "caique@email.com.br"},
+            "password": {"type": "string", "example": "123456"}
+          }
+        },
+        "UserResponse":{
+          "type": "object",
+          "properties": {
+            "id": {"type": "string", "example": "6fbba364-310e-4605-a7e7-e0904df4259b"},
+            "name": {"type": "string", "example": "Caique"},
+            "email": {"type": "string", "example": "caique@email.com.br"}
+          }
+        },
+        "UserLogin":{
+          "type": "object",
+          "properties": {
+            "email": {"type": "string", "example": "caique@email.com.br"},
+            "password": {"type": "string", "example": "123456"}
+          }
+        },
+        "Companie": {
+          "type": "object",
+          "properties": {
+            "cnae": {"type": "string", "example": "1111-2/33"},
+            "cnpj": {"type": "string", "example": "11.222.333/4444-55"},
+            "nome_razao": {"type": "string", "example": "nome_razao"},
+            "nome_fantasia": {"type": "string", "example": "nome_fantasia"}
+          }
+        },
+        "CompanieResponse":{
+          "type": "object",
+          "properties": {
+            "id": {"type": "string", "example": "6fbba364-310e-4605-a7e7-e0904df4259b"},
+            "user_id": {"type": "string", "example": "6fbba364-310e-4605-a7e7-e0904df4334a"},
+            "cnae": {"type": "string", "example": "1111-2/33"},
+            "cnpj": {"type": "string", "example": "11.222.333/4444-55"},
+            "nome_razao": {"type": "string", "example": "nome_razao"},
+            "nome_fantasia": {"type": "string", "example": "nome_fantasia"}
+          }
+        }
+      },
+      "securitySchemes": {
+        "BearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    }
+  }
