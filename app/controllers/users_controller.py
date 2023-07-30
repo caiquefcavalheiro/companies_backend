@@ -67,7 +67,6 @@ class UserController:
 
         try:
             GeneralServices().validate_id(user_id, User)
-            find_user = self.repository.list_one(user_id, User)
 
             check_data, _ = GeneralServices().remove_unnecessary_keys(
                 update_data, self.user_keys
@@ -75,17 +74,14 @@ class UserController:
 
             GeneralServices().check_keys_type(check_data, self.user_key_types)
 
-            return {}
+            update_user = self.repository.update(user_id, check_data, User)
 
-            # self.repository.create(check_data, User)
-            # return {"message": "create user sucessfull"}, HTTPStatus.CREATED
+            return jsonify(update_user), HTTPStatus.OK
 
         except IntegrityError:
             return {"error": "Email already in use"}, HTTPStatus.CONFLICT
         except (AttributeTypeError, MissingKeysError, InvalidIdError) as e:
             return e.response, e.status_code
-
-        pass
 
     @jwt_required()
     def delete_user(self, user_id: str):

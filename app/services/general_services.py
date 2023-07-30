@@ -1,10 +1,13 @@
 from app.configs.database import db
 from app.exceptions import InvalidIdError, AttributeTypeError, MissingKeysError
+import uuid
 
 
 class GeneralServices:
     def validate_id(self, id: str, Model: db.Model):
-        if len(id) != 36:
+        try:
+            uuid.UUID(id)
+        except ValueError:
             raise InvalidIdError
 
         search_info = Model.query.filter_by(id=id).first()
