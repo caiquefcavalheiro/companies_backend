@@ -9,15 +9,7 @@ def init__app(app: Flask):
     swaggerui_blueprint = get_swaggerui_blueprint(
         SWAGGER_URL,
         API_URL,
-        config={"app_name": "Test application"},
-        oauth_config={
-            "clientId": "your-client-id",
-            "clientSecret": "your-client-secret-if-required",
-            "realm": "your-realms",
-            "appName": "your-app-name",
-            "scopeSeparator": " ",
-            "additionalQueryStringParams": {"test": "hello"},
-        },
+        config={"app_name": "Companies"},
     )
 
     app.register_blueprint(swaggerui_blueprint)
