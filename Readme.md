@@ -44,6 +44,12 @@ Na variável **SQLALCHEMY_DATABASE_URI** do seu arquivo .env, coloque a url do s
 
 Substituia os campos **username**, **password** e **database** pelos do seu banco de dados.
 
+Agora com a variável de ambiente configurada, precisando persistir as mudanças na tabela no banco de dados configurado.
+
+```bash
+flask db upgrade
+```
+
 ## Ligando a API
 
 Para iniciar o projeto agora basta digitar
