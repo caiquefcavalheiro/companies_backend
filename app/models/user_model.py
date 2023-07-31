@@ -22,7 +22,7 @@ class User(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name = Column(String(100), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
-    hash_password = Column(String(255), nullable=False)
+    hash_password = Column(String(255))
 
     @property
     def password(self):
@@ -30,7 +30,7 @@ class User(db.Model):
 
     @password.setter
     def password(self, password_to_hash):
-        self.hash_password = generate_password_hash(password_to_hash)
+        self.hash_password = generate_password_hash(password_to_hash, salt_length=16)
 
     def check_password(self, password_to_compare):
         return check_password_hash(self.hash_password, password_to_compare)

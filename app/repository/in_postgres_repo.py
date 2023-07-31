@@ -24,9 +24,9 @@ class InPostgresRepository:
         }
 
     def list_one(self, id: str, Database: db.Model):
-        user = self.session.query(Database).filter(Database.id == id).first()
+        model = self.session.query(Database).filter(Database.id == id).first()
 
-        return user
+        return model
 
     def create(self, data: dict, Database: db.Model):
         new_model = Database(**data)
@@ -47,14 +47,14 @@ class InPostgresRepository:
         return new_model
 
     def update(self, id: str, data: dict, Database: db.Model):
-        update_user = self.session.query(Database).filter(Database.id == id).first()
+        updade_model = self.session.query(Database).filter(Database.id == id).first()
 
         for key, value in data.items():
-            setattr(update_user, key, value)
+            setattr(updade_model, key, value)
 
         self.session.commit()
 
-        return update_user
+        return updade_model
 
     def delete(self, id: str, Database: db.Model, field: str = "id"):
         user_to_delete = (

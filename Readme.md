@@ -15,7 +15,7 @@ Em seguida, entre no ambiente virtual:
 ### Linux:
 
 ```bash
-Source venv/bin/activate 
+Source venv/bin/activate
 ```
 
 ### Windows
@@ -53,3 +53,7 @@ flask run
 ```
 
 E o projeto será iniciado na porta **http://127.0.0.1:5000**
+
+A documentação será encontrada na porta **http://127.0.0.1:5000/docs**
+
+Nos arquivos da aplicação também se encontra um arquivo **insomnia_companies.json**, já tendo toda automatização de rotas lá
